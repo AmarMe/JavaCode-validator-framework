@@ -125,7 +125,7 @@ public class FileUploadService {
         List<TestFile> testFile = repository.findAll();
 
         XSSFWorkbook workbook = new XSSFWorkbook();
-        XSSFSheet sheet = workbook.createSheet("UnitTesting");
+        XSSFSheet sheet = workbook.createSheet("TestsReport");
 
         // Create Header
         Row headerRow = sheet.createRow(0);
