@@ -10,53 +10,42 @@ document.getElementById('excelInput').addEventListener('change', function () {
 });
 
 
-    document.getElementById('fileInput').addEventListener('change', function () {
-        const fileName = this.files[0] ? this.files[0].name : 'No file selected';
-        document.getElementById('selectedFile').textContent = fileName;
-    });
-});
-
-
-// Upload file to backend and handle responses
 function uploadFile() {
-    const fileInput = document.getElementById('fileInput');
-    const file = fileInput.files[0];
+    const javaInput = document.getElementById('fileInput');
+    const excelInput = document.getElementById('excelInput');
+
+    const javaFile = javaInput.files[0];
+    const excelFile = excelInput.files[0];
 
     document.getElementById('uploadSuccess').style.display = 'none';
     document.getElementById('uploadError').style.display = 'none';
 
-    if (!file) {
-        document.getElementById('uploadError').textContent = "Please choose a file to upload.";
+    if (!javaFile || !excelFile) {
+        document.getElementById('uploadError').textContent = "Please choose both Java and Excel files.";
         document.getElementById('uploadError').style.display = 'block';
         return;
     }
 
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("javaFile", javaFile);
+    formData.append("excelFile", excelFile);
 
-    fetch("http://localhost:8080/unit-test-api/v1/upload-file", {
+    fetch("http://localhost:8080/unit-test-api/v1/upload-both", {
         method: "POST",
         body: formData
     })
     .then(response => {
         if (!response.ok) {
-            return response.text().then(text => {
-                throw new Error(text);
-            });
+            return response.text().then(text => { throw new Error(text); });
         }
-        return response.text(); // Get plain text (just like Postman)
+        return response.text();
     })
     .then(message => {
-        // Display success message in regular alert
         document.getElementById('uploadSuccess').textContent = message;
         document.getElementById('uploadSuccess').style.display = 'block';
-
-        // Display buttons
         document.getElementById("viewReportsBtn").style.display = "inline-block";
         document.getElementById("downloadReportBtn").style.display = "inline-block";
-
-        // Show popup with the specific message including method list
-        document.getElementById('popupMessage').textContent = "File uploaded and tested successfully: Method list[main]";
+        document.getElementById('popupMessage').textContent = "Files uploaded and tested successfully.";
         document.getElementById('successPopup').style.display = 'flex';
     })
     .catch(error => {
@@ -64,6 +53,7 @@ function uploadFile() {
         document.getElementById('uploadError').style.display = 'block';
     });
 }
+
 
 // Fetch and display employee test report from backend
 function loadEmployees() {
