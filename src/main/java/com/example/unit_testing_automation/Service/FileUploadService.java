@@ -22,7 +22,9 @@ import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class FileUploadService {
@@ -85,6 +87,9 @@ public class FileUploadService {
             Class<?> clazz = Class.forName(className,true,classLoader);
             Object instance = clazz.getDeclaredConstructor().newInstance();
 
+//            Method methodRetrieved = clazz.getDeclaredMethod("addition");
+//            System.out.println("The Method name is: "+methodRetrieved.getName());
+
             for(Method method: clazz.getDeclaredMethods()){
                 if(method.getParameterCount()==0){
                     method.setAccessible(true);
@@ -127,15 +132,12 @@ public class FileUploadService {
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet("TestsReport");
 
-        // Create Header
         Row headerRow = sheet.createRow(0);
         headerRow.createCell(0).setCellValue("ID");
         headerRow.createCell(1).setCellValue("Class_Name");
         headerRow.createCell(2).setCellValue("Method_Name");
         headerRow.createCell(3).setCellValue("Test_Status");
 
-
-        // Add Data
         int rowNum = 1;
         for (TestFile tfs : testFile) {
             Row row = sheet.createRow(rowNum++);
@@ -145,12 +147,9 @@ public class FileUploadService {
             row.createCell(3).setCellValue(tfs.getTestStatus());
 
         }
-        // Auto-size columns
         for (int i = 0; i < 4; i++) {
             sheet.autoSizeColumn(i);
         }
-
-        // Set content type and headers
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader("Content-Disposition", "attachment; filename=Tests_report.xlsx");
 
@@ -162,4 +161,59 @@ public class FileUploadService {
         workbook.close();
     }
 
+    public ResponseEntity<String> uploadAndRunTest(MultipartFile javaFile, MultipartFile testcaseExcelFile) {
+        String result = "";
+        try {
+            String originalUploadedFileName = javaFile.getOriginalFilename();
+            Path tempDir = Files.createTempDirectory("JavaFile_compile_dir");
+            System.out.println("Temp File Directory: "+tempDir);
+            File tempJavaFile = new File(tempDir.toFile(), originalUploadedFileName);
+            javaFile.transferTo(tempJavaFile);
+            tempJavaFile.deleteOnExit();
+
+            result = extractTestcaseExcelInputAndExecuteTests(tempJavaFile,originalUploadedFileName,testcaseExcelFile);
+
+        } catch (Exception e) {
+            System.out.println("Exception while processing file: "+e.getMessage());
+            return new ResponseEntity<>("Something went wrong while processing file",HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(result,HttpStatus.OK);
+    }
+
+    private String extractTestcaseExcelInputAndExecuteTests(File tempJavaFile, String fileName,MultipartFile testcaseExcelFile ){
+        try {
+            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+            int compiledResult = compiler.run(null,null,null, tempJavaFile.getPath());
+            File tempParentDir = tempJavaFile.getParentFile();
+            if(compiledResult!=0)
+                return "Error occurred while compiling java class file";
+
+            String javaFileName = fileName.replace(".java","");
+            String className = "com.example.unit_testing_automation.TestDataFile."+javaFileName;
+            URLClassLoader classLoader= URLClassLoader.newInstance(new URL[]{tempParentDir.toURI().toURL()});
+            Class<?> clazz = Class.forName(className,true,classLoader);
+            Object instance = clazz.getDeclaredConstructor().newInstance();
+
+            List<Map<String,Object>> testCaseList = extractExcelTestCaseData(testcaseExcelFile);
+            for(Map<String,Object> testcase : testCaseList){
+                String methodName = testcase.get("methodName").toString();
+                Object[] inputValues = testcase.get("inputs");
+                String expectedOutput = testcase.get("expectedOutput").toString();
+
+                Object[] inputValues = (Object[]) inputs;
+            }
+
+
+        } catch (Exception e) {
+            System.out.println("Exception while running test: "+e.getMessage());
+        }
+        return "File uploaded and tested successfully";
+    }
+
+    private List<Map<String,Object>> extractExcelTestCaseData(MultipartFile testcaseExcelFile) {
+        List<Map<String,Object>> testcasesList = new ArrayList<>();
+
+        return testcasesList;
+
+    }
 }

@@ -43,62 +43,16 @@ public class FileUploadController {
         fileUploadService.exportToExcel(response);
     }
 
+    @PostMapping("/upload-and-runTest")
+    public ResponseEntity<String> uploadAndRunTest(@RequestBody MultipartFile javaFile, @RequestBody MultipartFile testcaseExcelFile){
+        if(javaFile.isEmpty() || javaFile==null){
+            return new ResponseEntity<>("Java file is empty: Upload a valid java project file",HttpStatus.BAD_REQUEST);
+        }
+        if(testcaseExcelFile.isEmpty() || testcaseExcelFile==null){
+            return new ResponseEntity<>("testcase file is empty: Upload a valid testcase excel file",HttpStatus.BAD_REQUEST);
+        }
 
-
-
-
-
-
-//    private void generateJUnitTestFromFile(File file) throws IOException, IOException {
-//        JavaParser javaParser = new JavaParser();
-//        CompilationUnit cu = new CompilationUnit();
-//
-//        ParseResult<CompilationUnit> parseResult = javaParser.parse(file);
-//        if (parseResult.isSuccessful() && parseResult.getResult().isPresent()) {
-//             cu = parseResult.getResult().get();
-//        } else {
-//            System.out.println("Parsing failed: " + parseResult.getProblems());
-//        }
-//        Optional<ClassOrInterfaceDeclaration> classOpt = cu.getClassByName(file.getName().replace(".java", ""));
-//
-//        if (classOpt.isEmpty()) return;
-//        ClassOrInterfaceDeclaration clazz = classOpt.get();
-//
-//        String className = clazz.getNameAsString();
-//        String testClassName = className + "Test";
-//
-//        StringBuilder testCode = new StringBuilder();
-//        testCode.append("package com.example.unittesttool.generated;\n\n")
-//                .append("import org.junit.jupiter.api.Test;\n")
-//                .append("import static org.junit.jupiter.api.Assertions.*;\n")
-//                .append("\n")
-//                .append("public class ").append(testClassName).append(" {\n\n")
-//                .append("    ").append(className).append(" obj = new ").append(className).append("();\n\n");
-//
-//        List<MethodDeclaration> methods = clazz.getMethods();
-//        for (MethodDeclaration method : methods) {
-//            testCode.append("    @Test\n")
-//                    .append("    public void test").append(capitalize(method.getNameAsString())).append("() {\n")
-//                    .append("        // Arrange\n")
-//                    .append("        // TODO: Add parameters\n")
-//                    .append("\n        // Act\n")
-//                    .append("        var result = obj.").append(method.getNameAsString()).append("();\n")
-//                    .append("\n        // Assert\n")
-//                    .append("        // TODO: Replace with expected result\n")
-//                    .append("        assertEquals(null, result);\n")
-//                    .append("    }\n\n");
-//        }
-//
-//        testCode.append("}\n");
-//
-//        Files.createDirectories(Paths.get(GENERATED_TESTS));
-//        Path testFilePath = Paths.get(GENERATED_TESTS + testClassName + ".java");
-//        Files.write(testFilePath, testCode.toString().getBytes());
-//    }
-//
-//    private String capitalize(String str) {
-//        if (str == null || str.isEmpty()) return str;
-//        return str.substring(0, 1).toUpperCase() + str.substring(1);
-//    }
+        return fileUploadService.uploadAndRunTest(javaFile,testcaseExcelFile);
+    }
 
 }
