@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/unit-test-api/v1")
@@ -35,7 +36,7 @@ public class FileUploadController {
         return new ResponseEntity<>(testFileList, HttpStatus.OK);
     }
 
-    @GetMapping("/export-students")
+    @GetMapping("/export-data")
     public void exportStudentsToExcel(HttpServletResponse response) throws IOException {
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader("Content-Disposition", "attachment; filename=unit-test-task1.xlsx");
@@ -44,6 +45,20 @@ public class FileUploadController {
     }
 
 
+
+    @PostMapping("/uploadexcel")
+    public ResponseEntity<List<Map<String, Object>>> uploadExcel(@RequestParam("file") MultipartFile file) {
+        try {
+            // Process the uploaded Excel file using readExcelSimple method
+            List<Map<String, Object>> result = fileUploadService.readExcelSimple(file);
+
+            // Return the processed data as a response
+            return ResponseEntity.ok(result);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
 
 
 
