@@ -23,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -160,6 +161,70 @@ public class FileUploadService {
         }
         workbook.close();
     }
+    public List<Map<String, Object>> readExcelSimple(MultipartFile file) throws IOException {
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        XSSFWorkbook workbook = new XSSFWorkbook(file.getInputStream());
+        XSSFSheet sheet = workbook.getSheetAt(0);
+
+        Row headerRow = sheet.getRow(0);
+        int totalCols = headerRow.getLastCellNum();
+
+        for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+            Row row = sheet.getRow(i);
+            if (row == null) continue;
+
+            Map<String, Object> rowData = new LinkedHashMap<>();
+
+            for (int j = 0; j < totalCols; j++) {
+                String header = headerRow.getCell(j).getStringCellValue().trim();
+                String cellValue = row.getCell(j) != null ? row.getCell(j).toString().trim() : "";
+
+                if (header.equalsIgnoreCase("input1")) {
+                    // Use manual splitting and processing instead of streams
+                    String[] rawInputs = cellValue.split(",");
+                    List<Object> inputs = new ArrayList<>();
+
+                    for (int k = 0; k < rawInputs.length; k++) {
+                        String value = rawInputs[k].trim();                      // Step 1: Trim whitespace
+                        Object converted = convertToBestType(value);            // Step 2: Convert to best type
+                        inputs.add(converted);                                  // Step 3: Add to list
+                    }
+                    System.out.println(inputs);
+                    rowData.put(header, inputs);                                // Step 4: Store in map
+                } else {
+                    rowData.put(header, cellValue);
+                }
+            }
+            System.out.println(rowData);
+            result.add(rowData);
+        }
+        System.out.println(result);
+        workbook.close();
+        return result;
+    }
+
+    private Object convertToBestType(String value) {
+        // Check for Integer
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException ignored) {}
+
+
+        try {
+            return Double.parseDouble(value);
+        } catch (NumberFormatException ignored) {}
+
+        // Check for Char (only one character)
+        if (value.length() == 1) {
+            return value.charAt(0);
+        }
+
+        // Default to String
+        return value;
+    }
+
+
 
     public ResponseEntity<String> uploadAndRunTest(MultipartFile javaFile, MultipartFile testcaseExcelFile) {
         String result = "";
