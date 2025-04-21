@@ -44,6 +44,18 @@ public class FileUploadController {
         fileUploadService.exportToExcel(response);
     }
 
+    @PostMapping("/upload-and-runTest")
+    public ResponseEntity<String> uploadAndRunTest(@RequestBody MultipartFile javaFile, @RequestBody MultipartFile testcaseExcelFile){
+        if(javaFile.isEmpty() || javaFile==null){
+            return new ResponseEntity<>("Java file is empty: Upload a valid java project file",HttpStatus.BAD_REQUEST);
+        }
+        if(testcaseExcelFile.isEmpty() || testcaseExcelFile==null){
+            return new ResponseEntity<>("testcase file is empty: Upload a valid testcase excel file",HttpStatus.BAD_REQUEST);
+        }
+
+
+        return fileUploadService.uploadAndRunTest(javaFile,testcaseExcelFile);
+    }
 
 
     @PostMapping("/uploadexcel")
@@ -115,5 +127,6 @@ public class FileUploadController {
 //        if (str == null || str.isEmpty()) return str;
 //        return str.substring(0, 1).toUpperCase() + str.substring(1);
 //    }
+
 
 }
