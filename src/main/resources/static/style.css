@@ -1,6 +1,6 @@
 :root {
-    --primary-color: #4361ee;
-    --primary-hover: #3a56d4;
+    --primary-color: #1d6f42;
+    --primary-hover: #155f36;
     --secondary-color: #3f37c9;
     --secondary-hover: #332fa3;
     --success-color: #4cc9f0;
@@ -60,7 +60,7 @@ h1 {
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
     padding: 55px;
-    margin-bottom: 30px;
+    margin-bottom: 50px;
     transition: var(--transition);
 }
 
@@ -116,11 +116,11 @@ h1 {
 
 /* Excel button styling */
 .file-input-wrapper:first-child .file-input-label {
-    background-color: #1d6f42; /* Excel green */
+    background-color: #4361ee; /* Excel green */
 }
 
 .file-input-wrapper:first-child .file-input-label:hover {
-    background-color: #155f36; /* Darker Excel green on hover */
+    background-color: #3a56d4; /* Darker Excel green on hover */
 }
 
 /* Java button styling */
@@ -183,12 +183,12 @@ h1 {
 }
 
 .btn-primary {
-    background-color: var(--primary-color);
+    background-color: #008080;
     color: white;
 }
 
 .btn-primary:hover {
-    background-color: var(--primary-hover);
+    background-color: #006666;
     transform: translateY(-2px);
 }
 

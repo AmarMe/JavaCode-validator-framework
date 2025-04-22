@@ -2,7 +2,7 @@ package com.example.unit_testing_automation.TestDataFile;
 
 public class BankAccount {
 
-    public String checkMinBalance(double currentBalance, String customerName){
+    public String checkMinBalance(double currentBalance){
         double minBalance = 5000.00;
         if(currentBalance >= minBalance){
             return "You have sufficient balance amount";

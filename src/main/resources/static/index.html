@@ -13,41 +13,38 @@
         <p class="subtitle">Upload your Java files for automated testing</p>
     </header>
 
-  <div class="button-container">
-      <div class="card upload-section">
-          <div class="file-input-row">
-              <div class="file-input-wrapper">
-                  <!-- Excel File Input -->
-                  <label for="excelInput" class="file-input-label">
-                      <!-- Excel SVG icon -->
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" class="bi bi-file-earmark-excel" viewBox="0 0 16 16">
-                          <path d="M5.884 6.68 4.332 9.5h.855l.822-1.482.823 1.482h.855L6.142 6.68l1.246-2.18h-.855l-.823 1.482-.822-1.482H4.332l1.552 2.18z"/>
-                          <path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h6.5L14 4.5zM13.5 4H10V.5L13.5 4z"/>
-                      </svg>
-                      <span>Choose Excel File</span>
-                  </label>
-                  <input type="file" id="excelInput" accept=".xlsx,.xls" style="display:none;">
-                  <div id="selectedExcelFile" class="selected-file">No file selected</div>
-              </div>
+    <div class="card upload-section">
+        <!-- File input row that contains BOTH inputs -->
+        <div class="file-input-row">
+            <div class="file-input-wrapper">
+                <!-- Java File Input -->
+                <label for="fileInput" class="file-input-label">
+                    <!-- Java SVG icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <span>Choose Project file</span>
+                </label>
+                <input type="file" id="fileInput" accept=".java">
+                <div id="selectedFile" class="selected-file">No file selected</div>
+            </div>
 
-              <div class="file-input-wrapper">
-                  <!-- Java File Input -->
-                  <label for="fileInput" class="file-input-label">
-                      <!-- Java SVG icon -->
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                          <polyline points="17 8 12 3 7 8"></polyline>
-                          <line x1="12" y1="3" x2="12" y2="15"></line>
-                      </svg>
-                      <span>Choose Java File</span>
-                  </label>
-                  <input type="file" id="fileInput" accept=".java">
-                  <div id="selectedFile" class="selected-file">No file selected</div>
-              </div>
-          </div>
-      </div>
-
-
+            <div class="file-input-wrapper">
+                <!-- Excel File Input -->
+                <label for="excelInput" class="file-input-label">
+                    <!-- Excel SVG icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" class="bi bi-file-earmark-excel" viewBox="0 0 16 16">
+                        <path d="M5.884 6.68 4.332 9.5h.855l.822-1.482.823 1.482h.855L6.142 6.68l1.246-2.18h-.855l-.823 1.482-.822-1.482H4.332l1.552 2.18z"/>
+                        <path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h6.5L14 4.5zM13.5 4H10V.5L13.5 4z"/>
+                    </svg>
+                    <span>Choose Testcase file</span>
+                </label>
+                <input type="file" id="excelInput" accept=".xlsx,.xls">
+                <div id="selectedExcelFile" class="selected-file">No file selected</div>
+            </div>
+        </div>
 
         <div class="actions">
             <button class="btn btn-primary" onclick="uploadFile()">
@@ -138,7 +135,6 @@
         </div>
     </div>
 </div>
-
 
 <script src="script.js"></script>
 </body>
