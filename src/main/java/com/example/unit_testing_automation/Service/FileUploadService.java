@@ -222,6 +222,11 @@ public class FileUploadService {
         if (value.length() == 1) {
             return value.charAt(0);
         }
+        if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")) {
+            return Boolean.parseBoolean(value);
+        }
+
+        // Default to String
         return value;
     }
 

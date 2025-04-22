@@ -59,7 +59,7 @@ h1 {
     background-color: var(--card-bg);
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
-    padding: 25px;
+    padding: 55px;
     margin-bottom: 30px;
     transition: var(--transition);
 }
@@ -76,16 +76,30 @@ h1 {
     align-items: center;
 }
 
+/* File input row styling - fixed to display in one line */
+.file-input-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
 .file-input-wrapper {
     flex: 1;
     max-width: 48%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .file-input-label {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 15px 25px;
+    padding: 12px 25px;
     background-color: var(--primary-color);
     color: white;
     border-radius: var(--border-radius);
@@ -93,18 +107,32 @@ h1 {
     transition: var(--transition);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     width: 100%;
-}
-
-.file-input-label:hover {
-    background-color: var(--primary-hover);
-    transform: translateY(-2px);
+    margin: 10px;
 }
 
 .file-input-label svg {
     margin-right: 10px;
 }
 
-#fileInput {
+/* Excel button styling */
+.file-input-wrapper:first-child .file-input-label {
+    background-color: #1d6f42; /* Excel green */
+}
+
+.file-input-wrapper:first-child .file-input-label:hover {
+    background-color: #155f36; /* Darker Excel green on hover */
+}
+
+/* Java button styling */
+.file-input-wrapper:last-child .file-input-label {
+    background-color: var(--primary-color); /* Blue for Java */
+}
+
+.file-input-wrapper:last-child .file-input-label:hover {
+    background-color: var(--primary-hover); /* Darker blue on hover */
+}
+
+#fileInput, #excelInput {
     display: none; /* Hide the default file input */
 }
 
@@ -116,6 +144,14 @@ h1 {
     padding: 10px;
     border-radius: 5px;
     text-align: center;
+    width: 100%;
+}
+
+.button-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .actions {
@@ -363,6 +399,14 @@ footer {
     border-top: 1px solid #e9ecef;
 }
 
+/* Additional styles that might be needed */
+.selected-file-name {
+    display: inline-block;
+    margin-left: 12px;
+    font-style: italic;
+    color: #333;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
     .container {
@@ -372,6 +416,15 @@ footer {
 
     h1 {
         font-size: 2rem;
+    }
+
+    .file-input-row {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .file-input-wrapper {
+        max-width: 100%;
     }
 
     .actions {
@@ -387,38 +440,3 @@ footer {
         width: 95%;
     }
 }
-.file-input-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    background-color: #1d6f42; /* Excel green tone */
-    color: white;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: background-color 0.3s ease;
-    margin-top: 12px;
-}
-
-.file-input-label:hover {
-    background-color: #155f36;
-}
-
-.selected-file-name {
-    display: inline-block;
-    margin-left: 12px;
-    font-style: italic;
-    color: #333;
-}
-.ile-input-row {
-    display: flex;
-    flex-direction: row; /* Ensure buttons are aligned horizontally */
-    justify-content: space-between; /* Distribute space between buttons */
-    gap: 15px; /* Adjust the gap between buttons */
-    margin: 20px;
-    align-items: center; /* Align items vertically centered */
-}
-
-
-
