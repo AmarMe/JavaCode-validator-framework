@@ -180,18 +180,19 @@ public class FileUploadService {
                 String header = headerRow.getCell(j).getStringCellValue().trim();
                 String cellValue = row.getCell(j) != null ? row.getCell(j).toString().trim() : "";
 
-                if (header.equalsIgnoreCase("input1")) {
+                if (header.equalsIgnoreCase("Inputs")) {
                     // Use manual splitting and processing instead of streams
+                    cellValue = cellValue.replaceAll("[\\[\\]]","");
                     String[] rawInputs = cellValue.split(",");
                     List<Object> inputs = new ArrayList<>();
 
                     for (int k = 0; k < rawInputs.length; k++) {
-                        String value = rawInputs[k].trim();                      // Step 1: Trim whitespace
-                        Object converted = convertToBestType(value);            // Step 2: Convert to best type
-                        inputs.add(converted);                                  // Step 3: Add to list
+                        String value = rawInputs[k].trim();
+                        Object converted = convertToBestType(value);
+                        inputs.add(converted);
                     }
                     System.out.println(inputs);
-                    rowData.put(header, inputs);                                // Step 4: Store in map
+                    rowData.put(header, inputs);
                 } else {
                     rowData.put(header, cellValue);
                 }
@@ -205,22 +206,22 @@ public class FileUploadService {
     }
 
     private Object convertToBestType(String value) {
-        // Check for Integer
+        if (value == null || value.trim().isEmpty()) {
+            return null;
+        }
+        value = value.trim();
+
         try {
             return Integer.parseInt(value);
         } catch (NumberFormatException ignored) {}
-
 
         try {
             return Double.parseDouble(value);
         } catch (NumberFormatException ignored) {}
 
-        // Check for Char (only one character)
         if (value.length() == 1) {
             return value.charAt(0);
         }
-
-        // Default to String
         return value;
     }
 
@@ -259,26 +260,56 @@ public class FileUploadService {
             Class<?> clazz = Class.forName(className,true,classLoader);
             Object instance = clazz.getDeclaredConstructor().newInstance();
 
-            List<Map<String,Object>> testCaseList = extractExcelTestCaseData(testcaseExcelFile);
+            List<Map<String,Object>> testCaseList = readExcelSimple(testcaseExcelFile);
             for(Map<String,Object> testcase : testCaseList){
-                String methodName = testcase.get("methodName").toString();
-                Object[] inputValues = testcase.get("inputs");
-                String expectedOutput = testcase.get("expectedOutput").toString();
+                String methodName = testcase.get("Method_Name").toString();
+                List<?> inputValuesList = (List<?>) testcase.get("Inputs");
+                Object[] inputValues = inputValuesList.toArray();
 
-                Object[] inputValues = (Object[]) inputs;
+                String expectedOutput = testcase.get("ExpectedOutput").toString();
+
+                for(Method method: clazz.getDeclaredMethods()){
+                    if(!method.getName().equals(methodName)) continue;
+
+                    Class<?>[] parameters = method.getParameterTypes();
+                    if(inputValues.length != parameters.length) continue;
+
+                    Object[] finalParameterValues = new Object[parameters.length];
+                    for(int i=0;i< parameters.length;i++){
+                        finalParameterValues[i] = convertToParamType(inputValues[i],parameters[i]);
+                    }
+
+                    Object actualResult = method.invoke(instance,finalParameterValues);
+                    String actualOutput = (actualResult!=null)? actualResult.toString() : "null";
+                    String testStatus = (actualOutput.equals(expectedOutput))? "Passed" : "Failed";
+
+                    TestFile testFile = new TestFile(javaFileName,methodName,testStatus);
+                    repository.save(testFile);
+                }
             }
-
-
         } catch (Exception e) {
             System.out.println("Exception while running test: "+e.getMessage());
         }
         return "File uploaded and tested successfully";
     }
 
-    private List<Map<String,Object>> extractExcelTestCaseData(MultipartFile testcaseExcelFile) {
-        List<Map<String,Object>> testcasesList = new ArrayList<>();
+    private Object convertToParamType(Object inputValue, Class<?> parameter) {
+        if(inputValue==null) return null;
+        if(parameter.isAssignableFrom(inputValue.getClass())){
+            return inputValue;
+        }
+        String rawValue = inputValue.toString();
+        if(parameter == int.class || parameter == Integer.class)
+            return Integer.parseInt(rawValue);
+        else if(parameter == double.class || parameter == Double.class)
+            return Double.parseDouble(rawValue);
+        else if(parameter == boolean.class || parameter == Boolean.class)
+            return Boolean.parseBoolean(rawValue);
+        else if(parameter == long.class || parameter == Long.class)
+            return Long.parseLong(rawValue);
+        else if(parameter == String.class)
+            return rawValue;
 
-        return testcasesList;
-
+        throw new IllegalArgumentException("Unsupported parameter type: "+parameter.getName());
     }
 }
