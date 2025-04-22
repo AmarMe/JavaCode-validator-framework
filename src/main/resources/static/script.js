@@ -30,7 +30,7 @@ function uploadFile() {
     formData.append("javaFile", javaFile);
     formData.append("excelFile", excelFile);
 
-    fetch("http://localhost:8080/unit-test-api/v1/upload-both", {
+    fetch("http://localhost:8080/unit-test-api/v1/upload-and-runTest", {
         method: "POST",
         body: formData
     })
