@@ -183,22 +183,22 @@ h1 {
 }
 
 .btn-primary {
-    background-color: #008080;
+    background-color: #a52a2a;
     color: white;
 }
 
 .btn-primary:hover {
-    background-color: #006666;
+    background-color: #8b2323;
     transform: translateY(-2px);
 }
 
 .btn-secondary {
-    background-color: var(--secondary-color);
+    background-color: #a52a2a;
     color: white;
 }
 
 .btn-secondary:hover {
-    background-color: var(--secondary-hover);
+    background-color: #8b2323;
     transform: translateY(-2px);
 }
 
