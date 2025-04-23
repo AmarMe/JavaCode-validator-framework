@@ -3,9 +3,8 @@ package com.example.unit_testing_automation.Service;
 import com.example.unit_testing_automation.Model.TestFile;
 import com.example.unit_testing_automation.Repository.FileUploadRepository;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
+import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -131,28 +131,84 @@ public class FileUploadService {
         List<TestFile> testFile = repository.findAll();
 
         XSSFWorkbook workbook = new XSSFWorkbook();
-        XSSFSheet sheet = workbook.createSheet("TestsReport");
+        XSSFSheet sheet = workbook.createSheet("JavaFile test report");
 
+        // Create styles
+        XSSFCellStyle headerStyle = workbook.createCellStyle();
+        XSSFFont headerFont = workbook.createFont();
+        headerFont.setBold(true);
+        headerFont.setFontHeightInPoints((short) 12);
+        XSSFFont normalFont = workbook.createFont();
+        normalFont.setFontHeightInPoints((short) 12);
+
+        headerStyle.setFont(headerFont);
+        headerStyle.setFillForegroundColor(customizedColumnColor(120, 162, 222));
+        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        headerStyle.setAlignment(HorizontalAlignment.CENTER);
+        headerStyle.setBorderTop(BorderStyle.THIN);
+        headerStyle.setBorderBottom(BorderStyle.THIN);
+        headerStyle.setBorderLeft(BorderStyle.THIN);
+        headerStyle.setBorderRight(BorderStyle.THIN);
+        headerStyle.setAlignment(HorizontalAlignment.CENTER);
+        headerStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+
+        CellStyle borderStyle = workbook.createCellStyle();
+        borderStyle.setAlignment(HorizontalAlignment.CENTER);
+        borderStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+
+        borderStyle.setBorderTop(BorderStyle.THIN);
+        borderStyle.setBorderBottom(BorderStyle.THIN);
+        borderStyle.setBorderLeft(BorderStyle.THIN);
+        borderStyle.setBorderRight(BorderStyle.THIN);
+
+        XSSFCellStyle passStyle = getXssfCellStyle(214, 247, 208,workbook, borderStyle);
+        XSSFCellStyle failStyle = getXssfCellStyle(252, 197, 197,workbook, borderStyle);
+
+        // Create Header
         Row headerRow = sheet.createRow(0);
-        headerRow.createCell(0).setCellValue("ID");
-        headerRow.createCell(1).setCellValue("Class_Name");
-        headerRow.createCell(2).setCellValue("Method_Name");
-        headerRow.createCell(3).setCellValue("Test_Status");
+        headerRow.setHeightInPoints(40);
+        String[] headers = {"ID", "Class_Name", "Method_Name", "Test_Status"};
+        for (int i = 0; i < headers.length; i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(headers[i]);
+            cell.setCellStyle(headerStyle);
+        }
 
+        // Add Data
         int rowNum = 1;
         for (TestFile tfs : testFile) {
             Row row = sheet.createRow(rowNum++);
-            row.createCell(0).setCellValue(tfs.getId());
-            row.createCell(1).setCellValue(tfs.getClassName());
-            row.createCell(2).setCellValue(tfs.getMethodName());
-            row.createCell(3).setCellValue(tfs.getTestStatus());
+            row.setHeightInPoints(25);
+            Cell cell0 = row.createCell(0);
+            cell0.setCellValue(tfs.getId());
+            cell0.setCellStyle(borderStyle);
+
+            Cell cell1 = row.createCell(1);
+            cell1.setCellValue(tfs.getClassName());
+            cell1.setCellStyle(borderStyle);
+
+            Cell cell2 = row.createCell(2);
+            cell2.setCellValue(tfs.getMethodName());
+            cell2.setCellStyle(borderStyle);
+
+            Cell cell3 = row.createCell(3);
+            cell3.setCellValue(tfs.getTestStatus());
+            if ("Passed".equalsIgnoreCase(tfs.getTestStatus())) {
+                cell3.setCellStyle(passStyle);
+            } else if ("Failed".equalsIgnoreCase(tfs.getTestStatus())) {
+                cell3.setCellStyle(failStyle);
+            } else {
+                cell3.setCellStyle(borderStyle); // Default style
+            }
+        }
+
+        for (int i = 0; i < 4; i++) {
+//            sheet.autoSizeColumn(i);
+            sheet.setColumnWidth(i,6000);
 
         }
-        for (int i = 0; i < 4; i++) {
-            sheet.autoSizeColumn(i);
-        }
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        response.setHeader("Content-Disposition", "attachment; filename=Tests_report.xlsx");
+        response.setHeader("Content-Disposition", "attachment; filename=file.xlsx");
 
         try {
             workbook.write(response.getOutputStream());
@@ -161,6 +217,22 @@ public class FileUploadService {
         }
         workbook.close();
     }
+
+    private XSSFCellStyle getXssfCellStyle(int r, int g, int b,XSSFWorkbook workbook, CellStyle borderStyle) {
+        XSSFCellStyle passStyle = workbook.createCellStyle();
+        passStyle.cloneStyleFrom(borderStyle);
+        passStyle.setFillForegroundColor(customizedColumnColor(r,g,b));
+        passStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        passStyle.setAlignment(HorizontalAlignment.CENTER);
+        passStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        return passStyle;
+    }
+
+    public XSSFColor customizedColumnColor(int r, int g, int b){
+        Color rgb = new Color(r,g,b);
+        return new XSSFColor(rgb,new DefaultIndexedColorMap());
+    }
+
     public List<Map<String, Object>> readExcelSimple(MultipartFile file) throws IOException {
         List<Map<String, Object>> result = new ArrayList<>();
 
