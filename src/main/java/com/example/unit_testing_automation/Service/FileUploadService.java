@@ -21,11 +21,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class FileUploadService {
@@ -238,7 +234,6 @@ public class FileUploadService {
 
         XSSFWorkbook workbook = new XSSFWorkbook(file.getInputStream());
         XSSFSheet sheet = workbook.getSheetAt(0);
-
         Row headerRow = sheet.getRow(0);
         int totalCols = headerRow.getLastCellNum();
 
@@ -339,12 +334,12 @@ public class FileUploadService {
 
             List<Map<String,Object>> testCaseList = readExcelSimple(testcaseExcelFile);
             for(Map<String,Object> testcase : testCaseList){
-                String methodName = testcase.get("Method_Name").toString();
+                String methodName = testcase.get("Method Name").toString();
                 List<?> inputValuesList = (List<?>) testcase.get("Inputs");
                 Object[] inputValues = inputValuesList.toArray();
 
-                String expectedOutput = testcase.get("ExpectedOutput").toString();
-
+                String expectedOutput = testcase.get("Expected Output").toString();
+                int expectedStatusCode = (int) Double.parseDouble(testcase.get("Expected Status Code").toString());
                 for(Method method: clazz.getDeclaredMethods()){
                     if(!method.getName().equals(methodName)) continue;
 
@@ -357,8 +352,11 @@ public class FileUploadService {
                     }
 
                     Object actualResult = method.invoke(instance,finalParameterValues);
-                    String actualOutput = (actualResult!=null)? actualResult.toString() : "null";
-                    String testStatus = (actualOutput.equals(expectedOutput))? "Passed" : "Failed";
+                    ResponseEntity<?> actualResponse = (ResponseEntity<?>) actualResult;
+                    int actualStatusCode = actualResponse.getStatusCode().value();
+                    String actualOutput = Objects.requireNonNull(actualResponse.getBody()).toString();
+                    actualOutput = (actualOutput!=null)? actualOutput : "null";
+                    String testStatus = (actualOutput.equals(expectedOutput)) && (actualStatusCode == expectedStatusCode)? "Passed" : "Failed";
 
                     TestFile testFile = new TestFile(javaFileName,methodName,testStatus);
                     repository.save(testFile);
