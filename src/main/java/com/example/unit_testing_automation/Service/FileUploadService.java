@@ -118,13 +118,17 @@ public class FileUploadService {
 
     // Get All
     public List<TestFile> allTestReports() {
-        List<TestFile> testFileList = repository.findAll();
+        List<TestFile> testFileList = repository.findAll().stream()
+                .sorted(Comparator.comparingInt(TestFile::getId))
+                .toList();;
         return testFileList;
     }
 
     //excel generator
     public void exportToExcel(HttpServletResponse response) throws IOException {
-        List<TestFile> testFile = repository.findAll();
+        List<TestFile> testFile = repository.findAll().stream()
+                .sorted(Comparator.comparingInt(TestFile::getId))
+                .toList();
 
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet("JavaFile test report");
