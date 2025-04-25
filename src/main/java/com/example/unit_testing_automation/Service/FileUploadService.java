@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
+import java.awt.*;
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
@@ -22,6 +23,7 @@ import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.List;
 
 @Service
 public class FileUploadService {
@@ -118,13 +120,17 @@ public class FileUploadService {
 
     // Get All
     public List<TestFile> allTestReports() {
-        List<TestFile> testFileList = repository.findAll();
+        List<TestFile> testFileList = repository.findAll().stream()
+                .sorted(Comparator.comparingInt(TestFile::getId))
+                .toList();;
         return testFileList;
     }
 
     //excel generator
     public void exportToExcel(HttpServletResponse response) throws IOException {
-        List<TestFile> testFile = repository.findAll();
+        List<TestFile> testFile = repository.findAll().stream()
+                .sorted(Comparator.comparingInt(TestFile::getId))
+                .toList();
 
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet("JavaFile test report");
