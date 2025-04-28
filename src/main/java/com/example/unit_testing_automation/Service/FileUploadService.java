@@ -178,11 +178,12 @@ public class FileUploadService {
 
         // Add Data
         int rowNum = 1;
+        int slNo = 1;
         for (TestFile tfs : testFile) {
             Row row = sheet.createRow(rowNum++);
             row.setHeightInPoints(25);
             Cell cell0 = row.createCell(0);
-            cell0.setCellValue(tfs.getId());
+            cell0.setCellValue(slNo++);
             cell0.setCellStyle(borderStyle);
 
             Cell cell1 = row.createCell(1);
